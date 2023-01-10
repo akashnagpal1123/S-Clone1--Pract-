@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 
-
+.abc-checking-login{
+}
 .grid-template-areas {
     grid-template-areas:
         "sidenav main"
