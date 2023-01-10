@@ -7,14 +7,10 @@ module.exports = {
         'green': '#1DB954',
         'dark': '#191414',
         'light': '#FFFFFF',
-        'purple': '#7e5bef',
-        'pink': '#ff49db',
-        'orange': '#ff7849',
-     
-        'yellow': '#ffc82c',
-        'gray-dark': '#273444',
-        'gray': '#8492a6',
-        'gray-light': '#d3dce6',
+        "green": "#1DB954",
+        "light-black": "#282828",
+        "secondary": "#b3b3b3",
+        "gray": "#535353"
       },
 
     },
