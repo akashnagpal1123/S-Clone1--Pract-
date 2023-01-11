@@ -10,6 +10,7 @@ const getAccessToken = () => {
     const accessToken = localStorage.getItem(ACCESS_TOKEN);
     const expiresIn = localStorage.getItem(EXPIRES_IN);
     const tokenType = localStorage.getItem(TOKEN_TYPE);
+    
     if (Date.now() < expiresIn) {
         return { accessToken, tokenType } 
     } else { // logout
