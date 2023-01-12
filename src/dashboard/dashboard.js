@@ -35,14 +35,57 @@ const loadUserProfile = async () => {
 }
 
 
-const loadFeaturedPlaylist = async () => {
-    const featuredPlaylist = await fetchRequest(ENDPOINT.featuredPlaylist);
-    console.log(featuredPlaylist);
+const onPlaylistItemClicked = (event) => {
+    console.log(event.target)
 }
+
+
+const loadPlaylist = async (endpoint, elementId) => {
+    // const featuredPlaylist = await fetchRequest(ENDPOINT.featuredPlaylist);
+    const { playlists: { items, } } = await fetchRequest(endpoint);
+    const playlistItemsSection = document.querySelector(`#${elementId}`);
+
+
+    for (let { name, description, images, id } of items) {
+
+        const playlistItem = document.createElement("section")
+        playlistItem.className = "bg-black-secondary rounded p-4 hover:cursor-pointer hover:bg-light-black"
+        playlistItem.id = id;
+
+        playlistItem.setAttribute("data-type", "playlist")
+        playlistItem.addEventListener("click", onPlaylistItemClicked)
+
+
+        const [{ url: imageUrl }] = images;
+        playlistItem.innerHTML =
+            `<img src="${imageUrl}" alt="${name}" class="rounded mb-2 object-contain shadow">
+                    <h2 class="text-base font-semibold mb-4 truncate"   >${name}</h2>
+                    <h3 class="text-sm text-secondary line-clamp-2">${description}</h3>`;
+
+        playlistItemsSection.appendChild(playlistItem);
+
+    }
+
+
+    // console.log(featuredPlaylist);
+}
+
+const loadPlaylists = () =>{
+    loadPlaylist(ENDPOINT.featuredPlaylist, "featured-playlist-items");
+
+    loadPlaylist(ENDPOINT.toplists, "top-playlist-items");
+}
+
+//To be uncommented---below code
+// const fillContentForDashboard = () =>{
+//     const playlistMap = new Map([["featured","featured-playlist-items"]["top-playlists","top-playlist-items"]])
+//     let inerHTML = "";
+//     for(let )
+// }
 
 document.addEventListener("DOMContentLoaded", () => {
     loadUserProfile();
-    loadFeaturedPlaylist();
+    loadPlaylists();
 
     document.addEventListener("click", () => {
         const profileMenu = document.querySelector("#profile-menu");
