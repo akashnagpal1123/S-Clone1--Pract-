@@ -70,27 +70,57 @@ const loadPlaylist = async (endpoint, elementId) => {
     // console.log(featuredPlaylist);
 }
 
-const loadPlaylists = () =>{
+const loadPlaylists = () => {
     loadPlaylist(ENDPOINT.featuredPlaylist, "featured-playlist-items");
-
     loadPlaylist(ENDPOINT.toplists, "top-playlist-items");
+
 }
 
-//To be uncommented---below code
-// const fillContentForDashboard = () =>{
-//     const playlistMap = new Map([["featured","featured-playlist-items"]["top-playlists","top-playlist-items"]])
-//     let inerHTML = "";
-//     for(let )
-// }
+// To be uncommented---below code
+const fillContentForDashboard = () => {
+    const pageContent = document.querySelector("#page-content");
+
+    const playlistMap = new Map([["featured", "featured-playlist-items"],["top-playlists", "top-playlist-items"]])
+    let innerHTML = "";
+    for (let [type, id] of playlistMap) {
+        innerHTML += `
+        <article class="p-4 ">
+        Content
+        <h1 class="text-2xl mb-4 font-bold capitalize">${type}</h1>
+        <section id="${id}"
+          class="featured-songs grid-cols-auto-fill-cards grid gap-4 ">
+        </section>
+
+      </article>
+      `
+    }
+    pageContent.innerHTML = innerHTML;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     loadUserProfile();
+    fillContentForDashboard();
     loadPlaylists();
 
     document.addEventListener("click", () => {
         const profileMenu = document.querySelector("#profile-menu");
         if (!profileMenu.classList.contains("hidden")) {
             profileMenu.classList.add("hidden");
+        }
+
+    })
+
+    document.querySelector(".content").addEventListener("scroll",(event)=>{
+        const {scrollTop} = event.target;
+        const header= document.querySelector(".header");
+        if(scrollTop >= header.offsetHeight)
+        {
+            header.classList.add("sticky","top-0","bg-black-secondary");
+            header.classList.remove("bg-transparent");
+        }
+        else{
+            header.classList.remove("sticky","top-0","bg-black-secondary");
+            header.classList.add("bg-transparent");
         }
 
     })
