@@ -58,8 +58,7 @@ const loadPlaylist = async (endpoint, elementId) => {
 
         playlistItem.setAttribute("data-type", "playlist")
 
-        playlistItem.addEventListener("click", (event) => onPlaylistItemClicked(event, id));
-
+        playlistItem.addEventListener("click", (event) => onPlaylistItemClicked(event, id)); 
 
         const [{ url: imageUrl }] = images;
         playlistItem.innerHTML =
