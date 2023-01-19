@@ -11,6 +11,7 @@ const getAccessToken = () => {
         return { accessToken, tokenType }
     } else {
         logout();
+
     }
 
 }
