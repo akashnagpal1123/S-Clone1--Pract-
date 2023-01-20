@@ -271,7 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     document.querySelector(".content").addEventListener("scroll", (event) => {
-        console.log("Hello");
         const { scrollTop } = event.target;
         const header = document.querySelector(".header");
         if (scrollTop >= header.offsetHeight) {
@@ -301,4 +300,3 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSection(event.state);
     })
 })
-
