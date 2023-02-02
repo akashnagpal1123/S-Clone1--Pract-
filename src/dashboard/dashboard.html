@@ -1,4 +1,3 @@
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -123,9 +122,35 @@
 
     </article>
 
-    <footer>
-      <div class="now-playing">Now Playing
-      </div>
+    <footer class="now-playing border-t border-t-light-black bg-black-secondary px-4 text-secondary ">
+      <section class="grid grid-cols-[1fr_2fr_1fr] place-content-center gap-4">
+
+        <section>
+          <img class="h-12 w-12" id="now-playing-image" src="" alt="title">
+          <section class=" flex flex-col justify-center">
+            <h2 id="now-playing-song" class="text-sm font-semibold text-primary">Song title</h2>
+            <p id="now-playing-artist" class="text-xs ">Song artist</p>
+          </section>
+        </section>
+
+
+<!-- Section for audio control -->
+
+        <section id="audio-control">Audio Control
+          <section>
+            
+          </section>
+        </section>
+
+        <!-- Section for volume -->
+
+        <section> Volume </section>
+
+      </section>
+
+
+
+
     </footer>
   </main>
 
