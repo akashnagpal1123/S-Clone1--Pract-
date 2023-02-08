@@ -9,6 +9,8 @@ const songDurationCommpleted = document.querySelector("#song-duration-completed"
 
 const songProgress = document.querySelector("#progress")
 
+let progressInterval;
+
 const onProfileClick = (event) => {
     event.stopPropagation();
     const profileMenu = document.querySelector("#profile-menu");
@@ -111,7 +113,7 @@ const fillContentForDashboard = () => {
 
 
 function formatDuration(duration) {
-    const min = Math.floor(duration / 60000);
+    const min = Math.floor(duration / 60_000);
     const sec = ((duration % 60000) / 1000).toFixed(0);
     const formmattedTime = sec == 60 ?
         min + 1 + ":00" : min + ":" + (sec < 10 ? '0' : '') + sec;
@@ -132,8 +134,8 @@ const onTrackSelection = (id, event) => {
 
 // const timeline = document.querySelector("#")
 
-const onAudioMetadataLoaded = ()=>{
-    totalSongDuration.textContent = audio.duration;
+const onAudioMetadataLoaded = () => {
+    totalSongDuration.textContent = `0:${audio.duration.toFixed(0)}`;
 }
 
 
@@ -159,12 +161,27 @@ const onPlayTrack = (event, { image, artistNames, name, duration, previewURL, id
     songTitle.textContent = name;
     artists.textContent = artistNames;
 
-    audio.addEventListener("loadedMetadata", onAudioMetadataLoaded )
-
-    audio.removeEventListener("loadedMetadata", onAudioMetadataLoaded) 
-
     audio.src = previewURL;
+
+    //doubt
+    audio.removeEventListener("loadedmetadata", onAudioMetadataLoaded)
+    audio.addEventListener("loadedmetadata", onAudioMetadataLoaded)
+
     audio.play();
+    clearInterval(progressInterval);
+
+    progressInterval = setInterval(() => {
+        if (audio.paused)
+        {
+              return console.log("paused");
+        }
+          
+
+
+        songDurationCommpleted.textContent = formatDuration(audio.currentTime * 1000);
+        songProgress.style.width = (audio.currentTime / audio.duration)*100;
+    }, 100)
+
 
 
 
