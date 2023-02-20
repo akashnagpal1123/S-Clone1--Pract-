@@ -1,15 +1,5 @@
 import { fetchRequest } from "../api";
-import { ENDPOINT, logout, SECTIONTYPE } from "../common";
-
-const audio = new Audio();
-const volume = document.querySelector("#volume");
-const playButton = document.querySelector("#play");
-const totalSongDuration = document.querySelector("#total-song-duration");
-const songDurationCommpleted = document.querySelector("#song-duration-completed");
-
-const songProgress = document.querySelector("#progress")
-
-let progressInterval;
+import { ENDPOINT, logout, SECTIONTYPE } from "../common"
 
 const onProfileClick = (event) => {
     event.stopPropagation();
@@ -113,7 +103,7 @@ const fillContentForDashboard = () => {
 
 
 function formatDuration(duration) {
-    const min = Math.floor(duration / 60_000);
+    const min = Math.floor(duration / 60000);
     const sec = ((duration % 60000) / 1000).toFixed(0);
     const formmattedTime = sec == 60 ?
         min + 1 + ":00" : min + ":" + (sec < 10 ? '0' : '') + sec;
@@ -132,59 +122,8 @@ const onTrackSelection = (id, event) => {
     })
 }
 
-// const timeline = document.querySelector("#")
-
-const onAudioMetadataLoaded = () => {
-    totalSongDuration.textContent = `0:${audio.duration.toFixed(0)}`;
-}
-
-
-
-const onPlayTrack = (event, { image, artistNames, name, duration, previewURL, id }) => {
-    console.log(image, artistNames, name, duration, previewURL, id);
-
-    // <section>
-    //     <img class="h-12 w-12" id="now-playing-image" src="" alt="title">
-    //         <section class=" flex flex-col justify-center">
-    //             <h2 id="now-playing-song" class="text-sm font-semibold text-primary">Song title</h2>
-    //             <p id="now-playing-artists" class="text-xs ">Song artist</p>
-    //         </section>
-
-    const nowPlayingSongImage = document.querySelector('#now-playing-image');
-
-    const songTitle = document.querySelector('#now-playing-song');
-
-    nowPlayingSongImage.src = image.url;
-
-    const artists = document.querySelector('#now-playing-artists');
-
-    songTitle.textContent = name;
-    artists.textContent = artistNames;
-
-    audio.src = previewURL;
-
-    //doubt
-    audio.removeEventListener("loadedmetadata", onAudioMetadataLoaded)
-    audio.addEventListener("loadedmetadata", onAudioMetadataLoaded)
-
-    audio.play();
-    clearInterval(progressInterval);
-
-    progressInterval = setInterval(() => {
-        if (audio.paused)
-        {
-              return console.log("paused");
-        }
-          
-
-
-        songDurationCommpleted.textContent = formatDuration(audio.currentTime * 1000);
-        songProgress.style.width = (audio.currentTime / audio.duration)*100;
-    }, 100)
-
-
-
-
+const onPlayTrack = (event, {image, artistNames, name, duration, previewURL, id  }) => {
+    console.log(image, artistNames, name, duration, previewURL, id );
 }
 const loadPlaylistTracks = ({ tracks }) => {
     const trackSections = document.querySelector("#tracks");
@@ -192,7 +131,7 @@ const loadPlaylistTracks = ({ tracks }) => {
     let trackNumber = 1;
 
     for (let trackItem of tracks.items) {
-        let { id, artists, name, album, duration_ms: duration, preview_url: previewURL } = trackItem.track;
+        let { id, artists, name, album, duration_ms: duration, preview_rl: previewURL } = trackItem.track;
         let track = document.createElement("section");
         track.id = id;
 
@@ -205,18 +144,18 @@ const loadPlaylistTracks = ({ tracks }) => {
         let artistNames = Array.from(artists, artist => artist.name).join(", ");
 
         track.innerHTML = `
-            <p class=" rellative w-full flex justify-center items-center justify-self-center"><span class="track-no" >${trackNumber++}</span></p>
-            <section class="grid grid-cols-[auto_1fr] gap-3 place-items-center">
-                <img class="h-10 w-10" src="${image.url}" alt="${name}">
-                    <article class="flex flex-col gap-2 justify-center">
-                        <h2 class="text-primary text-base">${name}</h2>
-                        <p class="text-xs">${artistNames}</p>
-                    </article>
-            </section>
-
-            <p class="text-sm">${album.name}</p>
-            <p class="text-sm">${formatDuration(duration)}</p>
-            `;
+                <p class=" rellative w-full flex justify-center items-center justify-self-center"><span class="track-no" >${trackNumber++}</span></p>
+                <section class="grid grid-cols-[auto_1fr] gap-3 place-items-center">
+                  <img class="h-10 w-10" src="${image.url}" alt="${name}">
+                  <article class="flex flex-col gap-2 justify-center">
+                    <h2 class="text-primary text-base">${name}</h2>
+                    <p class="text-xs">${artistNames}</p>
+                  </article>
+                </section>
+    
+                <p class="text-sm">${album.name}</p>
+                <p class="text-sm">${formatDuration(duration)}</p>
+        `;
 
         track.addEventListener("click", (event) => {
             onTrackSelection(id, event);
@@ -240,24 +179,23 @@ const loadPlaylistTracks = ({ tracks }) => {
 
 
 const fillContentForPlaylist = async (playlistId) => {
-    const playlist =
-        await fetchRequest(`${ENDPOINT.playlist}/${playlistId}`);
+    const playlist = await fetchRequest(`${ENDPOINT.playlist}/${playlistId}`);
     const pageContent = document.querySelector("#page-content");
-    pageContent.innerHTML = `
-            <header id="playlist-header" class="mx-8 py-4 border-secondary border-b-[0.5px] z-10">
-                <nav class="py-2">
-                    <ul class="grid grid-cols-[50px_1fr_1fr_50px] gap-4 text-secondary line-clamp-1">
-                        <li class="justify-self-center line-clamp-1">#</li>
-                        <li>Title</li>
-                        <li>Album</li>
-                        <li>⏱</li>
-                    </ul>
-                </nav>
-            </header>
+    pageContent.innerHTML = `  
+    <header id ="playlist-header" class="mx-8 py-4 border-secondary border-b-[0.5px]">
+        <nav class="py-2">
+        <ul class="grid grid-cols-[50px_1fr_1fr_50px] gap-4 text-secondary line-clamp-1">
+        <li class="justify-self-center line-clamp-1">#</li>
+        <li>Title</li>
+        <li>Album</li>
+        <li>⏱</li>
+        </ul>
+        </nav>
+    </header>
 
-            <section class="px-8 text-secondary mt-4" id="tracks">
-            </section>
-            `
+    <section class="px-8 text-secondary mt-4" id="tracks">
+    </section>
+    `
 
 
 
@@ -313,7 +251,7 @@ const loadSection = (section) => {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadUserProfile();
-    // const section = {type: SECTIONTYPE.DASHBOARD }
+    // const section = { type: SECTIONTYPE.DASHBOARD }
 
     const section = { type: SECTIONTYPE.PLAYLIST, playlist: "37i9dQZF1DX4ghkRUdIogy" }
 
@@ -333,7 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     document.querySelector(".content").addEventListener("scroll", (event) => {
-        console.log("Hello");
         const { scrollTop } = event.target;
         const header = document.querySelector(".header");
         if (scrollTop >= header.offsetHeight) {
@@ -363,4 +300,3 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSection(event.state);
     })
 })
-
