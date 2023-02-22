@@ -6,9 +6,20 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     // vite config
-    // define: {
-    //   __APP_ENV__: env.APP_ENV,
-    // },
+    define: {
+      __APP_ENV__: env.APP_ENV,
+    },
     root: "src"
   }
 })
+
+// vite.config.js
+// import { defineConfig } from 'vite'
+// import dns from 'dns'
+
+// dns.setDefaultResultOrder('verbatim')
+
+// export default defineConfig({
+//   // omit
+// })
+
