@@ -8,6 +8,7 @@ const totalSongDuration = document.querySelector("#total-song-duration");
 const songDurationCommpleted = document.querySelector("#song-duration-completed");
 
 const songProgress = document.querySelector("#progress")
+const timeline = document.querySelector("#timeline")
 
 let progressInterval;
 
@@ -134,58 +135,115 @@ const onTrackSelection = (id, event) => {
 
 // const timeline = document.querySelector("#")
 
-const onAudioMetadataLoaded = () => {
+const updateIconsForPlayMode = (id) => {
+    playButton.querySelector("span").textContent = "pause_circle";
+    const playButtonFromTracks = document.querySelector(`#play-track${id}`);
+    playButtonFromTracks.textContent = "||";
+    playButtonFromTracks.setAttribute("data-play", "true");
+}
+
+const updateIconsForPauseMode = (id) => {
+    playButton.querySelector("span").textContent = "play_circle";
+    const playButtonFromTracks = document.querySelector(`#play-track${id}`);
+    playButtonFromTracks.textContent = "▶";
+    playButtonFromTracks.removeAttribute("data-play");
+}
+
+
+const onAudioMetadataLoaded = (id) => {
+    // totalSongDuration.textContent = `${audio.duration.toFixed(0)<10? ":0" + audio.currentTime.toFixed(0)}`;
     totalSongDuration.textContent = `0:${audio.duration.toFixed(0)}`;
+    updateIconsForPlayMode(id);
+
+}
+
+const onNowPlayingPlayButtonClicked = (id) => {
+    if (audio.paused) {
+        audio.play();
+        updateIconsForPlayMode(id);
+    }
+    else {
+        audio.pause();
+        updateIconsForPauseMode(id);
+    }
+
 }
 
 
 
 const onPlayTrack = (event, { image, artistNames, name, duration, previewURL, id }) => {
-    console.log(image, artistNames, name, duration, previewURL, id);
 
-    // <section>
-    //     <img class="h-12 w-12" id="now-playing-image" src="" alt="title">
-    //         <section class=" flex flex-col justify-center">
-    //             <h2 id="now-playing-song" class="text-sm font-semibold text-primary">Song title</h2>
-    //             <p id="now-playing-artists" class="text-xs ">Song artist</p>
-    //         </section>
+    const buttonWithDataPlay = document.querySelector(`[data-play=true]`);
 
-    const nowPlayingSongImage = document.querySelector('#now-playing-image');
+    // const button = event.target;
+    if (buttonWithDataPlay?.id === `play-track${id}`) {
+        if (audio.paused) {
+            audio.play();
+            updateIconsForPlayMode(id);
 
-    const songTitle = document.querySelector('#now-playing-song');
-
-    nowPlayingSongImage.src = image.url;
-
-    const artists = document.querySelector('#now-playing-artists');
-
-    songTitle.textContent = name;
-    artists.textContent = artistNames;
-
-    audio.src = previewURL;
-
-    //doubt
-    audio.removeEventListener("loadedmetadata", onAudioMetadataLoaded)
-    audio.addEventListener("loadedmetadata", onAudioMetadataLoaded)
-
-    audio.play();
-    clearInterval(progressInterval);
-
-    progressInterval = setInterval(() => {
-        if (audio.paused)
-        {
-              return console.log("paused");
         }
-          
+        else {
+            audio.pause();
+            updateIconsForPauseMode(id);
+        }
 
 
-        songDurationCommpleted.textContent = formatDuration(audio.currentTime * 1000);
-        songProgress.style.width = (audio.currentTime / audio.duration)*100;
-    }, 100)
+
+    }
+    else {
+        buttonWithDataPlay?.setAttribute("data-play", "false")
+
+        console.log(image, artistNames, name, duration, previewURL, id);
+
+        // <section>
+        //     <img class="h-12 w-12" id="now-playing-image" src="" alt="title">
+        //         <section class=" flex flex-col justify-center">
+        //             <h2 id="now-playing-song" class="text-sm font-semibold text-primary">Song title</h2>
+        //             <p id="now-playing-artists" class="text-xs ">Song artist</p>
+        //         </section>
+
+        const nowPlayingSongImage = document.querySelector('#now-playing-image');
+
+        const songTitle = document.querySelector('#now-playing-song');
+
+        nowPlayingSongImage.src = image.url;
+
+        const artists = document.querySelector('#now-playing-artists');
+
+        songTitle.textContent = name;
+        artists.textContent = artistNames;
 
 
+
+        audio.src = previewURL;
+
+        //doubt
+        audio.removeEventListener("loadedmetadata", () => onAudioMetadataLoaded(id))
+        audio.addEventListener("loadedmetadata", () => onAudioMetadataLoaded(id))
+
+        playButton.addEventListener("click", () =>
+            onNowPlayingPlayButtonClicked(id)
+        );
+
+        audio.play();
+        clearInterval(progressInterval);
+
+        // timeline.addEventListener("click")
+
+        progressInterval = setInterval(() => {
+            if (audio.paused) {
+                return console.log("paused");
+            }
+            songDurationCommpleted.textContent = formatDuration(audio.currentTime * 1000);
+            songProgress.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+        }, 100)
+
+    }
 
 
 }
+
+
 const loadPlaylistTracks = ({ tracks }) => {
     const trackSections = document.querySelector("#tracks");
 
@@ -242,6 +300,21 @@ const loadPlaylistTracks = ({ tracks }) => {
 const fillContentForPlaylist = async (playlistId) => {
     const playlist =
         await fetchRequest(`${ENDPOINT.playlist}/${playlistId}`);
+
+        console.log(playlist);
+
+    const {name, description, images, tracks} = playlist;
+    const coverElement = document.querySelector("#cover-content");
+    coverElement.innerHTML = `
+    <section>
+    <img class="object-contain h-36 w-36" src="${images[0].url}" alt="">
+    <h2 id="playlist-name" class="text-4xl">
+    ${name}</h2>
+
+    <p id="playlist-details">${tracks.items.length}</p>
+    </section>`
+    // <p id="playlist-artists">${playlist.name}</p>
+
     const pageContent = document.querySelector("#page-content");
     pageContent.innerHTML = `
             <header id="playlist-header" class="mx-8 py-4 border-secondary border-b-[0.5px] z-10">
@@ -313,12 +386,12 @@ const loadSection = (section) => {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadUserProfile();
-    // const section = {type: SECTIONTYPE.DASHBOARD }
+    const section = { type: SECTIONTYPE.DASHBOARD }
 
-    const section = { type: SECTIONTYPE.PLAYLIST, playlist: "37i9dQZF1DX4ghkRUdIogy" }
+    // const section = { type: SECTIONTYPE.PLAYLIST, playlist: "37i9dQZF1DX4ghkRUdIogy" }
 
-    // history.pushState(section, "", "");
-    history.pushState(section, "", `/dashboard/playlist/${section.playlist}`);
+    history.pushState(section, "", "");
+    // history.pushState(section, "", `/dashboard/playlist/${section.playlist}`);
 
     loadSection(section);
     // fillContentForDashboard();
@@ -357,6 +430,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     })
+
+    volume.addEventListener("change", () => {
+        audio.volume = volume.value / 100;
+    })
+
+    timeline.addEventListener("click", (e) => {
+        const timelineWidth = window.getComputedStyle(timeline).width;
+        const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * audio.duration;
+        audio.currentTime = timeToSeek;
+        songProgress.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+    }, false)
 
     window.addEventListener("popstate", (event) => {
         console.log(event);
